@@ -1,6 +1,5 @@
-def greet(name: str) -> str:
-    return f"Hello, {name}! Welcome to secure Git workflows."
-print("Feature Z enabled!")
+def add(a, b):
+    return a + b
 
 if __name__ == "__main__":
-    print(greet("Akshay"))
+    print(add(2, 3))
