@@ -78,7 +78,7 @@ def debug_info():
         return traceback.format_exc()
 
 if __name__ == "__main__":
-    print(add(2, 4))
+    print(add(2, 3))
     
     # Examples that will trigger alerts
     print(run_command("test"))
