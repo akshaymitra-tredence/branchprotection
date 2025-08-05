@@ -42,13 +42,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Initializes the CodeQL analysis for the specified language.
+      # For Python, this step automatically creates a database from the source code.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+      # The autobuild step is removed.
+      # For Python, it's not needed and can sometimes cause issues.
+      # CodeQL will perform its analysis directly on the source code provided by `checkout`.
 
+      # Runs the CodeQL analysis queries on the generated database.
+      # This step will identify potential security vulnerabilities and bugs.
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
