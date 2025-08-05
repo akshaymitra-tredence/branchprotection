@@ -49,8 +49,8 @@ async def get_user_data(user_id: str):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     # CodeQL will flag this as SQL injection
-    query = f"SELECT * FROM users WHERE id = '{user_id}'"
-    cursor.execute(query)
+    query = "SELECT * FROM users WHERE id = ?"
+    cursor.execute(query, (user_id,))
     result = cursor.fetchall()
     conn.close()
     return {"user_data": result}
