@@ -4,7 +4,7 @@ on:
     branches: [dev]
 jobs:
   test:
-    runs-on: [self-hosted, docker, linux] # Change this line to your labels
+    runs-on: self-hosted # Change this line to your labels
 
     steps:
     - name: Checkout code
