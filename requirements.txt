@@ -5,3 +5,4 @@ requests
 pyyaml
 python-dotenv
 pytest
+python-multipart
