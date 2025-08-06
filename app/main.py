@@ -286,7 +286,7 @@ async def health_check():
     return {"status": "healthy", "version": "1.0.0"}
 
 if __name__ == "__main__":
-    print(add(2, 3))
+    print(add(2, 4))
     
     # Run the FastAPI app with insecure settings
     uvicorn.run(
