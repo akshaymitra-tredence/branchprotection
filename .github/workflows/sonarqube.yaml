@@ -22,7 +22,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run -m pytest
-          coverage xml  # generates coverage.xml needed by SonarQube
+          coverage xml  # generates coverage.xml needed by SonarQube 
 
       - name: Analyze with SonarQube
         uses: SonarSource/sonarqube-scan-action@v1.1.0
