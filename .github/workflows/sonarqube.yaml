@@ -37,7 +37,7 @@ jobs:
           SONAR_HOST_URL: "http://host.docker.internal:9003"
         with:
           args: >
-            -Dsonar.projectKey=demo1234
+            -Dsonar.projectKey=branchprotection-git
             -Dsonar.sources=app
             -Dsonar.language=py
             -Dsonar.python.coverage.reportPaths=coverage.xml
