@@ -118,7 +118,7 @@ async def search(q: str = ""):
     <html>
         <head><title>Searchs Results</title></head>
         <body>
-            <h1>Search results for: {q}</h1>
+            <h1>Searchs results for: {q}</h1>
             <p>You searched for: {q}</p>
         </body>
     </html>
