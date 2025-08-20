@@ -40,15 +40,24 @@ jobs:
           echo "All directories:"
           find . -type d | head -20
 
-      - name: Analyze with SonarQube
-        uses: SonarSource/sonarqube-scan-action@v2.0.2
+      - name: Download and setup SonarScanner
+        run: |
+          if [ ! -d "sonar-scanner-5.0.1.3006-linux" ]; then
+            wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+            unzip sonar-scanner.zip
+          fi
+          export PATH=$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH
+          echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
+
+      - name: Run SonarQube analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: "http://host.docker.internal:9003"
-        with:
-          projectBaseDir: /tmp/github-runner/branchprotection/branchprotection
-          args: >
-            -Dsonar.projectKey=branchprotection-git
-            -Dsonar.sources=app
-            -Dsonar.language=py
-            -Dsonar.python.coverage.reportPaths=coverage.xml
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=branchprotection-git \
+            -Dsonar.sources=app \
+            -Dsonar.language=py \
+            -Dsonar.python.coverage.reportPaths=coverage.xml \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.login=$SONAR_TOKEN
