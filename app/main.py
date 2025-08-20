@@ -116,7 +116,7 @@ async def search(q: str = ""):
     # CodeQL will flag this as XSS vulnerability
     html_content = f"""
     <html>
-        <head><title>Search Results</title></head>
+        <head><title>Searchs Results</title></head>
         <body>
             <h1>Search results for: {q}</h1>
             <p>You searched for: {q}</p>
