@@ -2,14 +2,14 @@ name: Hello World with Approval
 
 on:
   workflow_run:
-    workflows: ["SonarQube analysis"]  # Name of the first workflow
+    workflows: ["Run Pytest on PR"]  # Name of the first workflow
     types:
       - completed  # Runs when the trigger workflow completes
 
 jobs:
   hello:
     # Only run if the trigger workflow succeeded
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'Success' }}
     runs-on: ubuntu-latest
     environment: dev  # Links to the environment with approval gate
 
