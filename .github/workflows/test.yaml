@@ -3,10 +3,10 @@ name: Hello World with Approval
 # Trigger: Runs only when SonarQube analysis workflow completes successfully
 on:
   workflow_run:
-    workflows: ["SonarQube Analysis"]  # Replace with your exact SonarQube workflow name
+    workflows: ["SonarQube analysis"]  # Exact match with your SonarQube workflow name
     types:
       - completed
-    branches: [feature/x]  # Optional: specify branches if needed
+    branches: ["feature/x"]  # Match the branch where SonarQube runs
 
 jobs:
   # First check if the triggering workflow was successful
