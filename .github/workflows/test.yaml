@@ -11,7 +11,7 @@ jobs:
     # Only run if the trigger workflow succeeded
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    environment: approval-gate  # Links to the environment with approval gate
+    environment: dev  # Links to the environment with approval gate
 
     steps:
       - name: Echo Hello World
