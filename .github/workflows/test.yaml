@@ -1,7 +1,11 @@
 name: Hello World with Approval
 
 # Trigger: Manual (via Actions tab) for easy testing. You can change to 'on: push' if needed.
-on: workflow_dispatch
+on:
+  push:
+    branches: [ "feature/x" ]
+  
+  workflow_dispatch:
 
 jobs:
   hello:
