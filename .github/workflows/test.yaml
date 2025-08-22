@@ -6,7 +6,8 @@ on:
     workflows: ["SonarQube Analysis"]  # Replace with your exact SonarQube workflow name
     types:
       - completed
-    
+    branches: [feature/x]  # Optional: specify branches if needed
+
 jobs:
   # First check if the triggering workflow was successful
   check-success:
