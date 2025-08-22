@@ -1,0 +1,14 @@
+name: Hello World with Approval
+
+# Trigger: Manual (via Actions tab) for easy testing. You can change to 'on: push' if needed.
+on: workflow_dispatch
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    # This links to the environment you created, triggering the approval gate.
+    environment: dev  # Replace with your environment name if different.
+
+    steps:
+      - name: Echo Hello World
+        run: echo "hello world"
