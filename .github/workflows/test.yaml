@@ -1,17 +1,17 @@
 name: Hello World with Approval
 
-# Trigger: Manual (via Actions tab) for easy testing. You can change to 'on: push' if needed.
 on:
-  push:
-    branches: [ "feature/x" ]
-  
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["SonarQube analysis"]  # Name of the first workflow
+    types:
+      - completed  # Runs when the trigger workflow completes
 
 jobs:
   hello:
+    # Only run if the trigger workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    # This links to the environment you created, triggering the approval gate.
-    environment: dev  # Replace with your environment name if different.
+    environment: approval-gate  # Links to the environment with approval gate
 
     steps:
       - name: Echo Hello World
