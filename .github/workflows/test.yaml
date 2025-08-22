@@ -1,17 +1,32 @@
 name: Hello World with Approval
 
+# Trigger: Runs only when SonarQube analysis workflow completes successfully
 on:
   workflow_run:
-    workflows: ["Run Pytest on PR"]  # Name of the first workflow
+    workflows: ["SonarQube Analysis"]  # Replace with your exact SonarQube workflow name
     types:
-      - completed  # Runs when the trigger workflow completes
-
+      - completed
+    
 jobs:
-  hello:
-    # Only run if the trigger workflow succeeded
-    if: ${{ github.event.workflow_run.conclusion == 'Success' }}
+  # First check if the triggering workflow was successful
+  check-success:
     runs-on: ubuntu-latest
-    environment: dev  # Links to the environment with approval gate
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      success: ${{ steps.check.outputs.success }}
+    steps:
+      - name: Check workflow success
+        id: check
+        run: |
+          echo "SonarQube workflow completed successfully"
+          echo "success=true" >> $GITHUB_OUTPUT
+
+  hello:
+    runs-on: ubuntu-latest
+    needs: check-success
+    if: ${{ needs.check-success.outputs.success == 'true' }}
+    # This links to the environment you created, triggering the approval gate.
+    environment: dev  # Replace with your environment name if different.
 
     steps:
       - name: Echo Hello World
