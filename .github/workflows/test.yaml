@@ -1,12 +1,14 @@
-name: Deploy to Dev Environment
+ame: Deploy to Dev Environment
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - dev
 
 jobs:
   deploy:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'feature/x'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
