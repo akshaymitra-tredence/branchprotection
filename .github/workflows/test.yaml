@@ -1,0 +1,34 @@
+name: Hello World with Approval
+
+# Trigger: Runs only when SonarQube analysis workflow completes successfully
+on:
+  workflow_run:
+    workflows: ["SonarQube analysis"]  # Exact match with your SonarQube workflow name
+    types:
+      - completed
+    branches: ["feature/x"]  # Match the branch where SonarQube runs
+
+jobs:
+  # First check if the triggering workflow was successful
+  check-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      success: ${{ steps.check.outputs.success }}
+    steps:
+      - name: Check workflow success
+        id: check
+        run: |
+          echo "SonarQube workflow completed successfully"
+          echo "success=true" >> $GITHUB_OUTPUT
+
+  hello:
+    runs-on: ubuntu-latest
+    needs: check-success
+    if: ${{ needs.check-success.outputs.success == 'true' }}
+    # This links to the environment you created, triggering the approval gate.
+    environment: dev  # Replace with your environment name if different.
+
+    steps:
+      - name: Echo Hello World
+        run: echo "hello world"
