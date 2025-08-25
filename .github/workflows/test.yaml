@@ -1,4 +1,4 @@
-ame: Deploy to Dev Environment
+name: Deploy to Dev Environment
 
 on:
   pull_request:
