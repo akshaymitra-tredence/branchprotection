@@ -5,8 +5,6 @@ on:
     workflows: ["Deploy to Dev Environment"]
     types:
       - completed
-    branches:
-      - dev
   workflow_dispatch:
     inputs:
       reason:
@@ -16,12 +14,24 @@ on:
 
 jobs:
   gate-approval:
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: dev
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
+      - name: Debug workflow_run event
+        if: github.event_name == 'workflow_run'
+        run: |
+          echo "Workflow run event details:"
+          echo "Workflow name: \${{ github.event.workflow_run.name }}"
+          echo "Conclusion: \${{ github.event.workflow_run.conclusion }}"
+          echo "Head branch: \${{ github.event.workflow_run.head_branch }}"
+          echo "Event: \${{ github.event.workflow_run.event }}"
         
       - name: Display trigger information
         run: |
