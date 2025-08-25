@@ -29,7 +29,7 @@ jobs:
       - name: Display trigger information
         run: |
           if [ "\${{ github.event_name }}" == "workflow_run" ]; then
-            echo "Triggered by successful completions of Deploy to Dev Environment workflow"
+            echo "Triggered by successful completion of Deploy to Dev Environment workflow"
             echo "Triggering workflow: \${{ github.event.workflow_run.name }}"
             echo "Conclusion: \${{ github.event.workflow_run.conclusion }}"
           else
