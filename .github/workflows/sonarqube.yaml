@@ -63,26 +63,26 @@ jobs:
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
 
-  approval-gate:
-    runs-on: self-hosted
-    name: Approval Gate
-    needs: sonarqube-analysis  # Only runs if SonarQube analysis succeeds
-    environment: dev  # This triggers the approval gate
+  # approval-gate:
+  #   runs-on: self-hosted
+  #   name: Approval Gate
+  #   needs: sonarqube-analysis  # Only runs if SonarQube analysis succeeds
+  #   environment: dev  # This triggers the approval gate
     
-    steps:
-      - name: Approval Required
-        run: |
-          echo "SonarQube analysis completed successfully!"
-          echo "Waiting for approval to proceed..."
+  #   steps:
+  #     - name: Approval Required
+  #       run: |
+  #         echo "SonarQube analysis completed successfully!"
+  #         echo "Waiting for approval to proceed..."
 
-  post-approval:
-    runs-on: self-hosted
-    name: Post Approval Actions
-    needs: approval-gate  # Only runs after approval
+  # post-approval:
+  #   runs-on: self-hosted
+  #   name: Post Approval Actions
+  #   needs: approval-gate  # Only runs after approval
     
-    steps:
-      - name: Echo Hello World
-        run: |
-          echo "Hello World!"
-          echo "Approval granted - proceeding with deployment/next steps"
-          echo "SonarQube analysis passed and was approved!"
+  #   steps:
+  #     - name: Echo Hello World
+  #       run: |
+  #         echo "Hello World!"
+  #         echo "Approval granted - proceeding with deployment/next steps"
+  #         echo "SonarQube analysis passed and was approved!"

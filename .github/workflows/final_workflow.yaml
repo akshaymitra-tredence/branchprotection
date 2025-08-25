@@ -7,30 +7,12 @@ on:
       - completed
     branches:
       - dev
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: 'Reason for manual trigger'
-        required: false
-        default: 'Manual execution'
 
 jobs:
   gate-approval:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    environment: dev
-    
     steps:
-      - name: Display Hello World on successful workflow completion
-        if: github.event_name == 'workflow_run'
+      - name: Output Hello World
         run: |
           echo "hello world"
-          
-      - name: Display Manual Trigger Information
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "Manually triggered"
-          echo "Reason: ${{ github.event.inputs.reason }}"
-          
-      - name: Gate Approval Test
-        run: |
-          echo "Gate approval test on another workflow successful"
