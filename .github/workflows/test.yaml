@@ -10,8 +10,6 @@ jobs:
   deploy:
     if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'feature/x'
     runs-on: ubuntu-latest
-    environment: dev
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
