@@ -15,14 +15,3 @@ jobs:
       - name: Deploy to Dev
         run: |
           echo "Deployment successful"
-          
-      - name: Log Event Details
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Pull request base branch: ${{ github.event.pull_request.base.ref }}"
-          echo "Pull request head branch: ${{ github.event.pull_request.head.ref }}"
-          echo "Workflow name: ${{ github.workflow }}"
-          echo "Run ID: ${{ github.run_id }}"
-          echo "Repository: ${{ github.repository }}"
-          echo "SHA: ${{ github.sha }}"
-          echo "Full event payload: ${{ toJSON(github.event) }}"
