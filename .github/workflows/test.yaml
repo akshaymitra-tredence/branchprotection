@@ -1,34 +1,21 @@
-name: Hello World with Approval
+ame: Deploy to Dev Environment
 
-# Trigger: Runs only when SonarQube analysis workflow completes successfully
 on:
-  workflow_run:
-    workflows: ["SonarQube analysis"]  # Exact match with your SonarQube workflow name
-    types:
-      - completed
-    branches: ["feature/x"]  # Match the branch where SonarQube runs
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
 
 jobs:
-  # First check if the triggering workflow was successful
-  check-success:
+  deploy:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'feature/x'
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    outputs:
-      success: ${{ steps.check.outputs.success }}
+    environment: dev
+    
     steps:
-      - name: Check workflow success
-        id: check
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Deploy to Dev
         run: |
-          echo "SonarQube workflow completed successfully"
-          echo "success=true" >> $GITHUB_OUTPUT
-
-  hello:
-    runs-on: ubuntu-latest
-    needs: check-success
-    if: ${{ needs.check-success.outputs.success == 'true' }}
-    # This links to the environment you created, triggering the approval gate.
-    environment: dev  # Replace with your environment name if different.
-
-    steps:
-      - name: Echo Hello World
-        run: echo "hello world"
+          echo "Deployment successful"
