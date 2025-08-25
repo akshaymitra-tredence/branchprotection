@@ -1,0 +1,42 @@
+name: Gate Approval Workflow
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Dev Environment"]
+    types:
+      - completed
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual execution'
+
+jobs:
+  gate-approval:
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: dev
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Display trigger information
+        run: |
+          if [ "\${{ github.event_name }}" == "workflow_run" ]; then
+            echo "Triggered by successful completion of Deploy to Dev Environment workflow"
+            echo "Triggering workflow: \${{ github.event.workflow_run.name }}"
+            echo "Conclusion: \${{ github.event.workflow_run.conclusion }}"
+          else
+            echo "Manually triggered"
+            echo "Reason: \${{ github.event.inputs.reason }}"
+          fi
+      
+      - name: Gate Approval Test
+        run: |
+          echo "Gate approval test on another workflow successful"
