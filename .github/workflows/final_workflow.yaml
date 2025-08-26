@@ -10,8 +10,9 @@ on:
 
 jobs:
   gate-approval:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Output Hello World
         run: |
-          echo "hello worlds new commit"
+          echo "hello worlds"
