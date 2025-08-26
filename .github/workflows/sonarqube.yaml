@@ -29,8 +29,8 @@ jobs:
       - name: Run tests with coverage (continue on failure)
         run: |
           set +e
-          python -m pytest tests/ \
-            --cov=app \
+          python -m pytest . \
+            --cov=. \
             --cov-report=xml:coverage.xml \
             --junit-xml=test-results.xml \
             -v
@@ -50,35 +50,37 @@ jobs:
           python -m coverage report || echo "Could not generate coverage report"
           set -e
 
-      - name: Cache SonarQube packages  # Efficiency: Cache scanner downloads
+      - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: SonarQube Scan  # Official action replaces manual download/run
+      - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "http://host.docker.internal:9003"  # Use var if not secret
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
         with:
           args: >
             -Dsonar.projectKey=branchprotection-git
             -Dsonar.projectName="Branch Protection Git Project"
-            -Dsonar.sources=app
-            -Dsonar.tests=tests
+            -Dsonar.sources=.
+            -Dsonar.inclusions=**/*.py
+            -Dsonar.test.inclusions=**/*test*.py
+            -Dsonar.exclusions=**/*test*.py
             -Dsonar.python.coverage.reportPaths=coverage.xml
             -Dsonar.python.xunit.reportPath=test-results.xml
             -Dsonar.python.version=3.9
             -Dsonar.sourceEncoding=UTF-8
 
-      - name: SonarQube Quality Gate Check  # Official action for QG
+      - name: SonarQube Quality Gate Check
         uses: sonarsource/sonarqube-quality-gate-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "http://host.docker.internal:9003"
-        timeout-minutes: 5  # Adjust as needed
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        timeout-minutes: 5
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
