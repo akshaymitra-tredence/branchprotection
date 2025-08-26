@@ -61,7 +61,7 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_HOST_URL: "http://host.docker.internal:9003"
         with:
           args: >
             -Dsonar.projectKey=branchprotection-git
@@ -79,7 +79,7 @@ jobs:
         uses: sonarsource/sonarqube-quality-gate-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_HOST_URL: "http://host.docker.internal:9003"
         timeout-minutes: 5
 
       - name: Upload coverage reports
