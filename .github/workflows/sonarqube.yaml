@@ -26,21 +26,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest coverage
 
+      # This is the key change: we need to run coverage from the root
+      # but point it to the source code directory.
       - name: Run tests with coverage
         run: |
-          coverage run -m pytest
-          coverage xml  # generates coverage.xml needed by SonarQube
-        continue-on-error: true  # This is the key addition!
+          coverage run --source=app -m pytest
+          coverage xml -o coverage.xml
+        continue-on-error: true
 
-      - name: Debug - List directory contents
+      # Debugging step: check if the coverage file exists and its contents.
+      # This is a crucial step for troubleshooting!
+      - name: Debug - Check coverage.xml
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Contents of current directory:"
-          ls -la
-          echo "Contents recursively:"
-          find . -type d -name "app" 2>/dev/null || echo "No 'app' directory found"
-          echo "All directories:"
-          find . -type d | head -20
+          echo "Looking for coverage.xml in $(pwd)"
+          if [ -f coverage.xml ]; then
+            echo "coverage.xml found!"
+            cat coverage.xml | head -n 20 # Print the first 20 lines to check paths
+          else
+            echo "coverage.xml NOT FOUND! SonarQube will fail."
+            exit 1 # Fail the workflow if the file is not there
+          fi
 
       - name: Download and setup SonarScanner
         run: |
@@ -59,7 +64,10 @@ jobs:
           sonar-scanner \
             -Dsonar.projectKey=branchprotection-git \
             -Dsonar.sources=app \
+            -Dsonar.tests=tests \
             -Dsonar.language=py \
             -Dsonar.python.coverage.reportPaths=coverage.xml \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
+
+      # ... (your commented-out jobs can be added back here)
