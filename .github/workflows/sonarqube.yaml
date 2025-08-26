@@ -1,4 +1,4 @@
-name: SonarQube analysis
+name: SonarQube Analysis
 
 on:
   push:
@@ -13,12 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          fetch-depth: 0  # Recommended for better analysis relevancy
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -32,14 +28,12 @@ jobs:
 
       - name: Run tests with coverage (continue on failure)
         run: |
-          set +e  # Don't exit on error if tests fail
-          
+          set +e
           python -m pytest tests/ \
             --cov=app \
             --cov-report=xml:coverage.xml \
             --junit-xml=test-results.xml \
             -v
-          
           TEST_EXIT_CODE=$?
           echo "Test exit code: $TEST_EXIT_CODE"
           echo "=== Test Results Summary ==="
@@ -48,66 +42,43 @@ jobs:
           else
             echo "❌ Some tests failed (exit code: $TEST_EXIT_CODE)"
           fi
-          
-          # Ensure coverage.xml exists even if tests fail
           if [ ! -f "coverage.xml" ]; then
             echo "Generating coverage.xml manually..."
             python -m coverage xml
           fi
-          
-          # Show coverage summary
           echo "=== Coverage Summary ==="
           python -m coverage report || echo "Could not generate coverage report"
-          
-          set -e  # Re-enable exit on error
+          set -e
 
-      - name: Download and setup SonarScanner
-        run: |
-          if [ ! -d "sonar-scanner-5.0.1.3006-linux" ]; then
-            wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-            unzip sonar-scanner.zip
-            rm sonar-scanner.zip
-          fi
-          export PATH=$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH
-          echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
+      - name: Cache SonarQube packages  # Efficiency: Cache scanner downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-      - name: Run SonarQube analysis
+      - name: SonarQube Scan  # Official action replaces manual download/run
+        uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "http://host.docker.internal:9003"
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=branchprotection-git \
-            -Dsonar.projectName="Branch Protection Git Project" \
-            -Dsonar.sources=app \
-            -Dsonar.tests=tests \
-            -Dsonar.python.coverage.reportPaths=coverage.xml \
-            -Dsonar.python.xunit.reportPath=test-results.xml \
-            -Dsonar.python.version=3.9 \
-            -Dsonar.sourceEncoding=UTF-8 \
-            -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.login=$SONAR_TOKEN
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}  # Use var if not secret
+        with:
+          args: >
+            -Dsonar.projectKey=branchprotection-git
+            -Dsonar.projectName="Branch Protection Git Project"
+            -Dsonar.sources=app
+            -Dsonar.tests=tests
+            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.python.xunit.reportPath=test-results.xml
+            -Dsonar.python.version=3.9
+            -Dsonar.sourceEncoding=UTF-8
 
-      - name: Check SonarQube Quality Gate
+      - name: SonarQube Quality Gate Check  # Official action for QG
+        uses: sonarsource/sonarqube-quality-gate-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "http://host.docker.internal:9003"
-        run: |
-          # Wait briefly to ensure SonarQube processes the analysis
-          sleep 5
-          
-          # Query the Quality Gate status
-          STATUS=$(curl -s -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=branchprotection-git" | jq -r '.projectStatus.status')
-          
-          echo "Quality Gate Status: $STATUS"
-          
-          # Fail the workflow if Quality Gate is not OK
-          if [ "$STATUS" != "OK" ]; then
-            echo "❌ Quality Gate failed: $STATUS"
-            exit 1
-          else
-            echo "✅ Quality Gate passed"
-          fi
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        timeout-minutes: 5  # Adjust as needed
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
