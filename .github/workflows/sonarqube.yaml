@@ -25,11 +25,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest coverage
-          # No need to install pytest-xunit. pytest handles this natively.
 
       - name: Run tests, generate coverage and JUnit reports
         run: |
-          # The --junitxml=report.xml flag is what you need.
           coverage run --source=app -m pytest --junitxml=report.xml || true
           coverage xml -o coverage.xml
 
@@ -59,6 +57,6 @@ jobs:
             -Dsonar.tests=tests \
             -Dsonar.language=py \
             -Dsonar.python.coverage.reportPaths=coverage.xml \
-            -Dsonar.testExecutionReportPaths=report.xml \
+            -Dsonar.python.xunit.reportPath=report.xml \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
