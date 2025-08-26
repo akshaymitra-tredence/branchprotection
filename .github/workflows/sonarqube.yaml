@@ -118,6 +118,6 @@ jobs:
   #   steps:
   #     - name: Echo Hello World
   #       run: |
-  #         echo "Hello World!"
+  #         echo "Hello Worlds!"
   #         echo "Approval granted - proceeding with deployment/next steps"
   #         echo "SonarQube analysis passed and was approved!"
