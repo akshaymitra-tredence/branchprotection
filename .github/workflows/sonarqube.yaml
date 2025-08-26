@@ -24,14 +24,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # We need `pytest-xunit` or newer `pytest` versions handle this natively.
-          # The command below installs a version that includes the junit feature.
-          pip install pytest coverage pytest-xunit
+          pip install pytest coverage
+          # No need to install pytest-xunit. pytest handles this natively.
 
       - name: Run tests, generate coverage and JUnit reports
         run: |
-          # The `--junitxml=report.xml` flag tells pytest to generate the report.
-          # The `|| true` is still there to ensure the step doesn't fail the job.
+          # The --junitxml=report.xml flag is what you need.
           coverage run --source=app -m pytest --junitxml=report.xml || true
           coverage xml -o coverage.xml
 
