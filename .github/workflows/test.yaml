@@ -16,4 +16,4 @@ jobs:
         
       - name: Deploy to Dev
         run: |
-          echo "Deployment successful"
+          echo "Deployment successsful"
