@@ -3,7 +3,6 @@ name: SonarQube analysis
 on:
   push:
     branches: [ "feature/x" ]
-  
   workflow_dispatch:
 
 jobs:
@@ -89,6 +88,27 @@ jobs:
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
 
+      - name: Check SonarQube Quality Gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: "http://host.docker.internal:9003"
+        run: |
+          # Wait briefly to ensure SonarQube processes the analysis
+          sleep 5
+          
+          # Query the Quality Gate status
+          STATUS=$(curl -s -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=branchprotection-git" | jq -r '.projectStatus.status')
+          
+          echo "Quality Gate Status: $STATUS"
+          
+          # Fail the workflow if Quality Gate is not OK
+          if [ "$STATUS" != "OK" ]; then
+            echo "❌ Quality Gate failed: $STATUS"
+            exit 1
+          else
+            echo "✅ Quality Gate passed"
+          fi
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -97,27 +117,3 @@ jobs:
           path: |
             coverage.xml
             test-results.xml
-
-  # approval-gate:
-  #   runs-on: self-hosted
-  #   name: Approval Gate
-  #   needs: sonarqube-analysis
-  #   environment: dev
-    
-  #   steps:
-  #     - name: Approval Required
-  #       run: |
-  #         echo "SonarQube analysis completed successfully!"
-  #         echo "Waiting for approval to proceed..."
-
-  # post-approval:
-  #   runs-on: self-hosted
-  #   name: Post Approval Actions
-  #   needs: approval-gate
-    
-  #   steps:
-  #     - name: Echo Hello World
-  #       run: |
-  #         echo "Hello Worlds!"
-  #         echo "Approval granted - proceeding with deployment/next steps"
-  #         echo "SonarQube analysis passed and was approved!"
