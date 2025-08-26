@@ -26,34 +26,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest coverage
 
-      # This is the key change: we need to run coverage from the root
-      # but point it to the source code directory.
-      - name: Run tests with coverage
+      # Step to run tests and coverage, ensuring report is always generated
+      - name: Run tests with coverage and generate report
         run: |
-          coverage run --source=app -m pytest
-          coverage xml -o coverage.xml
-        continue-on-error: true
+          # Execute pytest and coverage. The `|| true` ensures the step doesn't fail
+          # even if a test fails, allowing the coverage report to be generated.
+          coverage run --source=app -m pytest || true
 
-      # Debugging step: check if the coverage file exists and its contents.
-      # This is a crucial step for troubleshooting!
-      - name: Debug - Check coverage.xml
+          # Generate the coverage report as an XML file in the root directory.
+          coverage xml -o coverage.xml
+
+      # Crucial debugging step: check for the file's existence and content
+      - name: Debug - Check for coverage.xml file
         run: |
-          echo "Looking for coverage.xml in $(pwd)"
-          if [ -f coverage.xml ]; then
-            echo "coverage.xml found!"
-            cat coverage.xml | head -n 20 # Print the first 20 lines to check paths
-          else
-            echo "coverage.xml NOT FOUND! SonarQube will fail."
-            exit 1 # Fail the workflow if the file is not there
-          fi
+          echo "Checking for coverage.xml in $(pwd)"
+          ls -la coverage.xml
+          echo "Displaying the first 20 lines of coverage.xml"
+          head -n 20 coverage.xml
+        # This step will now fail if the file is not there,
+        # but that's a good thing for debugging.
 
       - name: Download and setup SonarScanner
         run: |
+          # Your existing SonarScanner setup logic
           if [ ! -d "sonar-scanner-5.0.1.3006-linux" ]; then
             wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
             unzip sonar-scanner.zip
           fi
-          export PATH=$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH
           echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
 
       - name: Run SonarQube analysis
@@ -64,10 +63,7 @@ jobs:
           sonar-scanner \
             -Dsonar.projectKey=branchprotection-git \
             -Dsonar.sources=app \
-            -Dsonar.tests=tests \
             -Dsonar.language=py \
             -Dsonar.python.coverage.reportPaths=coverage.xml \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
-
-      # ... (your commented-out jobs can be added back here)
