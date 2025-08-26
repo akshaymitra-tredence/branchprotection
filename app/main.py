@@ -62,10 +62,30 @@ def func(x, y, z):  # Poor function name
 def calculate_tax(amount):
     return amount * 0.18  # Magic number - should be a constant
 
-# Security issue - potential code injection
+# Security issues - multiple hotspots
 def unsafe_eval(user_input):
     # This is intentionally unsafe for demo purposes
     return eval(f"2 + 2 + {user_input}")  # Security hotspot
+
+import subprocess
+def unsafe_command(user_input):
+    # Command injection vulnerability
+    return subprocess.call(f"echo {user_input}", shell=True)
+
+import pickle
+def unsafe_pickle(data):
+    # Pickle deserialization vulnerability  
+    return pickle.loads(data)
+
+def weak_random():
+    import random
+    # Weak random number generation
+    return random.random()
+
+def sql_injection_risk(user_id):
+    # SQL injection pattern
+    query = f"SELECT * FROM users WHERE id = {user_id}"
+    return query
 
 # Memory inefficient - creating large lists
 def inefficient_function():
