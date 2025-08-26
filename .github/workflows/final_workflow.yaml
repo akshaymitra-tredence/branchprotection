@@ -15,4 +15,4 @@ jobs:
     steps:
       - name: Output Hello World
         run: |
-          echo "hello world"
+          echo "hello worlds"
